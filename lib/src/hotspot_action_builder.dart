@@ -10,6 +10,7 @@ class HotspotActionBuilder extends StatelessWidget {
     this.nextText = "Next",
     this.previousText = "Previous",
     this.endText = "End tour",
+    this.actionBeforeNext,
   });
 
   final CalloutActionController controller;
@@ -18,6 +19,7 @@ class HotspotActionBuilder extends StatelessWidget {
   final String nextText;
   final String previousText;
   final String endText;
+  final Future<void> Function()? actionBeforeNext;
 
   final _duration = const Duration(milliseconds: 250);
   final _curve = Curves.easeOutCirc;
@@ -61,7 +63,9 @@ class HotspotActionBuilder extends StatelessWidget {
                     curve: _curve,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: controller.index == i ? fg : fg?.withOpacity(0.3),
+                      color: controller.index == i
+                          ? fg
+                          : fg?.withValues(alpha: 0.3),
                     ),
                     height: 6,
                     width: 6,
@@ -79,7 +83,9 @@ class HotspotActionBuilder extends StatelessWidget {
                   controller.isLastPage ? doneText : nextText,
                   maxLines: 2,
                 ),
-                onPressed: () {
+                onPressed: () async {
+                  await actionBeforeNext?.call();
+
                   controller.next();
                 },
               ),
